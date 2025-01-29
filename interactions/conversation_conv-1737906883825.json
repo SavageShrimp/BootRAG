@@ -1,0 +1,26 @@
+{
+  "id": "conv-1737906883825",
+  "lastModified": 1737907174681,
+  "messages": [
+    {
+      "id": 1737906978619,
+      "role": "user",
+      "content": "how to use llm_evaluator evaluate_data"
+    },
+    {
+      "id": 1737906978621,
+      "role": "assistant",
+      "content": "<think>\nOkay, the user is asking how to use the `llm_evaluator evaluate_data` function. I remember that this function is part of the LLM Evaluation library. I should explain the basic steps, like how to import it and use it.\n\nFirst, I'll need to make sure to mention that they should import the library. Then, I'll go through the parameters they can use, like model_name, prompt, and examples. It's important to note that the examples should be in a specific format, with the input and output separated by \" => \".\n\nI should probably include an example to make it clearer. Maybe I can give a simple code snippet showing how to use the function. Also, I should remind them that they can pass more parameters if needed, and that they can check the documentation for more details.\n\nI need to keep the explanation straightforward and helpful, making sure the user can follow along easily.\n</think>\n\nTo use the `llm_evaluator evaluate_data` function, you can follow these steps:\n\n1. **Import the Library**: Make sure you have the LLM Evaluation library imported.\n\n2. **Use the Function**: Call the `evaluate_data` function with the necessary parameters.\n\n3. **Parameters**: The function allows you to specify the model name, prompt, and examples.\n\n4. **Examples Format**: The examples should be in the format of \"input => output\".\n\n5. **Return Value**: The function returns a dictionary with evaluation results.\n\n### Example Usage:\n```python\nfrom llm_evaluator import evaluate_data\n\nresult = evaluate_data(\n    model_name=\"gpt-4\",\n    prompt=\"What is your favorite color?\",\n    examples=[\n        \"What is your favorite color? => My favorite color is blue.\",\n        \"What is your favorite color? => My favorite color is green.\"\n    ]\n)\n\nprint(result)\n```\n\n### Explanation:\n- **model_name**: Specify the model, like \"gpt-4\" or \"gpt-3.5-turbo\".\n- **prompt**: Provide the prompt to evaluate.\n- **examples**: List of examples in the format \"input => output\".\n\nYou can find more details in the [LLM Evaluation library documentation](https://llm-evaluator.readthedocs.io/)."
+    },
+    {
+      "id": 1737907128810,
+      "role": "user",
+      "content": "how should i format the arguments to call the function"
+    },
+    {
+      "id": 1737907128812,
+      "role": "assistant",
+      "content": "<think>\nOkay, the user is asking how to format the arguments when calling the function. I remember in the previous message, I explained the parameters, but maybe they want a clearer example.\n\nI should provide a concise example with the parameters. Let me list the parameters clearly, mentioning optional ones. I'll highlight the model_name, prompt, and examples as the main parameters.\n\nIncluding an example will help them see the structure. I'll also mention the format for the examples again, using the input and output separated by \" => \".\n\nI should keep the explanation brief and straightforward, making sure the user can see the formatting clearly.\n</think>\n\nWhen calling the `evaluate_data` function, you can format the arguments as follows:\n\n```python\nevaluate_data(\n    model_name=\"gpt-4\",\n    prompt=\"What is your favorite color?\",\n    examples=[\n        \"What is your favorite color? => My favorite color is blue.\",\n        \"What is your favorite color? => My favorite color is green.\"\n    ]\n)\n```\n\n### Key Points:\n- **model_name**: Optional. Specifies the model to evaluate.\n- **prompt**: Optional. The prompt to evaluate.\n- **examples**: Optional. A list of examples in the format \"input => output\".\n\nThe examples should be in the format:\n\n```\n\"input => output\"\n```\n\nYou can omit optional parameters based on your needs."
+    }
+  ]
+}
