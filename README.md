@@ -17,7 +17,6 @@ It can accept a query and generate a response which is displayed in it's own res
 
 Feel free to contribute but not with code. Please submit prompts along with the model you used to generate the code. The code doesn't have to be generated perfectly, I will make small fixes or adapt the prompt for the models I use.
 
-Once cloned, the app can be run by changeing to the Bootstrap directory and running python api.py
 
 I am using a python virtual environment and  the python packages I needed to install on my machine were:
 
@@ -30,4 +29,7 @@ sentence-transformers
 llama-cpp-python
 
 I will generate a requirements.txt soon.
+
+Once cloned, modify the config.json and the app can be run by changeing to the Bootstrap directory and running python api.py
+
 
