@@ -15,4 +15,6 @@ At the moment it can accept text or file input and store chunks in an sqlite dat
 
 It can accept a query and generate a response which is displayed in it's own response div, although the developer recently broke the code and now the response divs overwrite each other.
 
+Feel free to contribute but not with code. Please submit prompts along with the model you used to generate the code. The code doesn't have to be generated perfectly, I will make small fixes or adapt the prompt for the models I use.
+
 
