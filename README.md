@@ -11,7 +11,7 @@ Everything here has been 99% written by a small number of models but the great m
 
 The idea is to use minimal dependancies in the end. The vector database is a simple sqlite3 database at the moment. The similarity code is a simple cosine difference
 
-At the moment it can acceot text or file input and store chunks in an sqlite database but they are not yet passed through to the backend for use.
+At the moment it can accept text or file input and store chunks in an sqlite database but they are not yet passed through to the backend for use.
 
 It can accept a query and generate a response which is displayed in it's own response div, although the developer recently broke the code and now the response divs overwrite each other.
 
