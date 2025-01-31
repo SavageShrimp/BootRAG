@@ -3,7 +3,7 @@ A RAG self built by LLMs
 
 After seeing the succes of the DeepSeek model since it was introduced, I wanted to have a go at getting an LLM to write a real application with minimum programmed input from a human. I chose a RAG because that's something that will help move it forward as it develops itself.
 
-A week ago I knew nothing about python or RAGS or any of the modules that the llm has generated code for, I didn't choose them or know their APIs.
+Although I am a programmer, when I started I knew very little about python or RAGS or any of the modules that the llm has generated code for, I didn't choose them or know their APIs.
 
 To get the code up and running I decided on python as the backend, interfacing to the Llama.cpp web interface. It has an html front end. The idea is to bootstrap using the python code until I can drop the llama.cpp html interface and rely soley on my own code. My long term goal is to have a flexible middle layer that can cater for a variety of apps
 
