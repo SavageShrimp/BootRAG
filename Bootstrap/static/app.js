@@ -1,3 +1,16 @@
+
+
+function generateRandomString(length) {
+    let randomString = Math.random().toString(36).substring(2, length + 2);
+    while (randomString.length < length) {
+        randomString += Math.random().toString(36).substring(2, length + 2);
+    }
+    return randomString.substring(0, length);
+}
+
+console.log(generateRandomString(7)); // Outputs a random 7-character string
+
+
 function processFile() {
     const fileInput = document.getElementById('file-upload');
     const textInput = document.getElementById('text-input');
@@ -38,7 +51,7 @@ function processText(doctext = undefined) {
         name: "text-input"
     };
 
-    console.log('Processing text:', doctext);
+    //console.log('Processing text:', doctext);
 
     fetch('/process', {
         method: 'POST',
@@ -53,7 +66,7 @@ function processText(doctext = undefined) {
         if (data.error) {
             addResponse('Error:', data.error, 'error');
         } else {
-            const decodedText = data.text;
+            const decodedText = '<pre><code>' + doctext + '</code></pre>';
             addResponse('Processed Text:', decodedText);
         }
     })
@@ -66,33 +79,99 @@ function processText(doctext = undefined) {
 
 let chatMessages = [];
 var response;
-var abortController = new AbortController()
+let abortController = null;
 
+function startRequest() {
+    abortController = new AbortController();
+
+    fetch('/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt: '...' }),
+        signal: abortController.signal
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network error');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        // Handle the response
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Update the CancelGenerate function
 function CancelGenerate() {
     if (abortController) {
-        abortController.abort();
-        fetch('/close', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: ""
-        })
+        try {
+            abortController.abort('User canceled the request');
+            console.log('Request aborted successfully');
+
+            // Perform cleanup only if the response was aborted
+            if (response && response.aborted) {
+                performCleanup();
+            }
+        } catch (error) {
+            console.error('Error aborting request:', error);
+        } finally {
+            // Reset the abortController
+            abortController = null;
+        }
     }
 }
 
+// Update performCleanup to handle stream errors
+function performCleanup() {
+    // Add error handling for the cleanup request
+    fetch('/close', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ /* any data needed */ })
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.warn('Close request failed:', response.statusText);
+            return;
+        }
+        console.log('Cleanup completed successfully');
+    })
+    .catch(error => {
+        console.error('Error in cleanup:', error);
+    });
+}
 
 async function generateResponse() {
     try {
-        const queryInput = document.getElementById('query-input');
-        const responseDiv = document.getElementById('response-list');
-        const elements = createResponseElements(responseDiv);
-        const { promptDiv, messageDiv } = elements;
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+            loadingElement.style.display = 'block';
+        }
 
-        promptDiv.textContent = queryInput.value.trim();
+        abortController = new AbortController();
+        const queryInput = document.getElementById('query-input');
+        const responseList = document.getElementById('response-list');
+
+        // Create a new response item using setupResponseDiv
+        const elements = setupResponseDiv(responseList);
+        const { responseDiv, promptDiv, messageDiv } = elements;
+
+        promptDiv.innerHTML = `<div>${queryInput.value.trim().replace(/\n/g, '<br>')}</div>`;
+        promptDiv.style.backgroundColor = '#e6e6fa'; // Light purple
 
         if (!queryInput.value.trim()) {
             showMessage(messageDiv, 'Please enter a question or prompt.');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
             return;
         }
 
@@ -109,6 +188,16 @@ async function generateResponse() {
             signal: abortController.signal
         });
 
+        // Check if request was aborted
+        if (response.aborted) {
+            showMessage(messageDiv, 'Request was canceled.');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+            performCleanup();
+            return;
+        }
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -117,10 +206,16 @@ async function generateResponse() {
     } catch (error) {
         console.error('Error in generateResponse:', error);
         showMessage(messageDiv, 'Error generating response.');
+        performCleanup();
     } finally {
         document.getElementById('generate-btn').disabled = false;
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+            loadingElement.style.display = 'none';
+        }
     }
 }
+
 
 function createResponseElements(container) {
     if (container.querySelector('.prompt') && container.querySelector('.message')) {
@@ -145,6 +240,12 @@ function createResponseElements(container) {
 }
 
 async function processStream(body, messageDiv) {
+    // Early check for aborted response
+    if (!body) {
+        showMessage(messageDiv, 'Request was canceled.');
+        return;
+    }
+
     const reader = await body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
@@ -168,17 +269,19 @@ async function processStream(body, messageDiv) {
             if (chunk[0] == '{') {
                 obj = JSON.parse(chunk);
                 fullText = obj.content || '';
-                // globalString += textToAdd; // Append the content with a line break
             } else {
                 fullText = chunk || '';
             }
 
-            // Replace "\n" with "<br>" before showing the message
-            fullText = fullText.replace(/\n/g, '<br>');
+            //showMessage(messageDiv, "<pre><code>"+fullText+"</pre></code>");
             showMessage(messageDiv, fullText);
 
         }
     } catch (error) {
+        if (error.name === 'AbortError') {
+            showMessage(messageDiv, 'Request was canceled.');
+            return;
+        }
         console.error('Error processing stream:', error);
         if (fullText !== '') {
             showMessage(messageDiv, 'Error generating response.');
@@ -186,9 +289,14 @@ async function processStream(body, messageDiv) {
     }
 }
 
+sp = new StringProcessor()
+
+
+
 function setupResponseDiv(container) {
     const responseDiv = document.createElement('div');
     responseDiv.className = 'response-item';
+    responseDiv.style.whiteSpace = 'normal'; // Add this line to enable word wrap
 
     const timestampDiv = document.createElement('div');
     timestampDiv.className = 'timestamp';
@@ -217,7 +325,19 @@ function setupResponseDiv(container) {
 }
 
 function showMessage(element, text) {
-    element.innerHTML += text
+    // Use the StringProcessor to accumulate and process the text
+    console.log(text)
+    sp.appendString(text);
+    sp.updateState();
+    //console.log(text)
+
+    // Retrieve the processed text from StringProcessor
+    const processedText = sp.getText();
+
+    // console.log(processedText)
+
+    // Set the element's innerHTML to the processed text
+    element.innerHTML = processedText;
 }
 
 function addResponse(prompt, responseText, type = 'info') {
@@ -234,3 +354,4 @@ function addResponse(prompt, responseText, type = 'info') {
     }
     responseList.appendChild(responseDiv);
 }
+

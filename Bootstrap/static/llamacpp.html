@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Processing Pipeline</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Add Prism CSS from static directory -->
+    <link rel="stylesheet" href="prism.css">
     <style>
         input#query-input {
             width: 100%;
@@ -48,6 +50,8 @@
                 <textarea id="query-input" rows="4" placeholder="Enter your query..."></textarea>
                 <button onclick="generateResponse()" id="generate-btn">Generate Response</button>
                 <button id="stop-btn" onclick="CancelGenerate()">Stop</button>
+                <!-- Add this element to your HTML where you want the loading indicator to appear -->
+                <div id="loading" style="display: none;">Processing...</div>
             </div>
         </div>
     </div>
@@ -59,6 +63,13 @@
         </div>
     </div>
 
+    <!-- Add Prism.js script and initialization -->
+    <script src="prism.js"></script>
+    <script>
+        // Initialize Prism.js
+        Prism.highlightAll();
+    </script>
+    <script src="process_text.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

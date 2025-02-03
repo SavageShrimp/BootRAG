@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conversation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow-blue.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .conversation {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+        }
+        .assistant-message {
+            background-color: #f0f4fe;
+        }
+        .code {
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="conversation">
+        <div id="loading">Loading...</div>
+        <div id="error-message"></div>
+        <div id="messages"></div>
+        <div id="codeList"></div>
+    </div>
+
+    <input type="file" id="fileInput" accept=".json" style="margin-top: 20px"/>
+    <script>
+
+    function generateMessageList(text) {
+        // Try to parse the input text as JSON
+        try {
+            const data = JSON.parse(text); // Parse the input text into a JSON object
+            const { id: conversationId, lastModified, messages } = data; // Extract the conversation ID, lastModified, and messages from the JSON
+            const processedMessages = messages.map(message => ({
+                conversationId, // Include the conversation ID in each message object
+                message: {
+                    id: message.id, // Include the message ID
+                    role: message.role, // Include the message role (user or assistant)
+                    content: message.content // Include the message content
+                }
+            })); // Map over each message to create a new array of objects
+            console.log(processedMessages)
+            return processedMessages; // Return the array of processed message objects
+        } catch (error) {
+            console.error("Error processing messages:", error); // Handle any JSON parsing errors
+            return []; // Return an empty array if there's an error
+        }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const processedMessages = generateMessageList(text);
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.innerHTML = '';
+
+                const stringProcessor = new StringProcessor();
+
+                stringProcessor.streaming = false
+
+                processedMessages.forEach(message => {
+                    // console.log(message)
+                    count = 0
+                    let processedContent = '';
+                    stringProcessor.processText(message.message.content)
+                    processedContent = stringProcessor.getText();
+
+if (1)
+{
+                    const li = document.createElement('div');
+                    //li.textContent = `${message.message.id}: ${processedContent}`;
+                    li.innerHTML = `${message.message.id}: ${processedContent}`;
+                    li.style['word-wrap'] = 'break-word';
+
+                    messagesDiv.appendChild(li);
+
+                    // Reset the StringProcessor for the next message
+                    stringProcessor.resetStringProcessor();
+}
+                });
+            };
+            reader.readAsText(file);
+        }
+    });
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <script src="process_text.js"></script>
+    <style>
+        /* Add this CSS to set the code color to orange */
+        [class*=" language-"] {
+            background-color: orange;
+        }
+    </style>
+</body>
+</html>
