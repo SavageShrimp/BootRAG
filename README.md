@@ -30,7 +30,7 @@ llama-cpp-python
 
 I will generate a requirements.txt soon.
 
-Once cloned, modify the config.json and the app can be run by changeing to the Bootstrap directory and running python api.py, then open a browser and navigate to 127.0.0.1/llamacpp.html
+Once cloned, checkout the import-dev branch, modify the config.json and then, the app can be run by changing to the Bootstrap directory and running python api.py, then open a browser and navigate to 127.0.0.1/llamacpp.html
 
 There is also a basic llama-server session viewer where you can load saved session files and view, http://127.0.0.1/viewer.html
 
